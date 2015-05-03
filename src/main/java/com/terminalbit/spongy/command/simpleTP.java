@@ -5,9 +5,12 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.player.Player;
+//import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
@@ -53,16 +56,21 @@ public class simpleTP implements CommandCallable {
 	}
 
 	public Optional<CommandResult> process(CommandSource cS, String passed){
-		game.getCommandDispatcher().process(game.getServer().getConsole(), "minecraft:tp " + cS.getName() + " " + passed);
-		for(Player player : game.getServer().getOnlinePlayers()) {
-			player.hasPermission("Spongy.tp");
-		}
+		Server server = game.getServer();
+		Player caller = server.getPlayer(cS.getName()).get();
+		Player destination = null;
+		if(passed.length() < 1){
+			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Format: /tp <username>"));
+		}else if(!server.getPlayer(passed).isPresent()){
+			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Player \"" + passed + "\" does not exist."));
+		}else{
+			destination = server.getPlayer(passed).get();
+			caller.setLocation(destination.getLocation());
+		}	
 		return Optional.of(CommandResult.empty());
 	}
 
-	public boolean testPermission(CommandSource arg0) {
-		logger.info("testPermission");
-		//I guess if it needs, then return true.
-		return true;
+	public boolean testPermission(CommandSource cS) {
+		return cS.hasPermission("Spongy.tp");
 	}
 }

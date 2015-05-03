@@ -5,8 +5,11 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Server;
+import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
@@ -16,7 +19,7 @@ import com.google.common.base.Optional;
 
 public class simpleTPHERE implements CommandCallable {
 	private Logger logger;
-	//private Game game;
+	private Game game;
 	private Text hT = Texts.of("Help Text");
 	private Text dT = Texts.of("Description!");
 	private Text usage = Texts.of("Usage!! :D");
@@ -26,7 +29,7 @@ public class simpleTPHERE implements CommandCallable {
     public simpleTPHERE(Logger logger, Game game) {
     	//Gets the, you know, stuff from the main class.
     	this.logger = logger;
-    	//this.game = game;
+    	this.game = game;
     }
 
     public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
@@ -52,13 +55,23 @@ public class simpleTPHERE implements CommandCallable {
 	}
 
 	public Optional<CommandResult> process(CommandSource cS, String passed){
-		//do stuff here when command is fired
+		Server server = game.getServer();
+		Player caller = server.getPlayer(cS.getName()).get();
+		Player destination = null;
+		if(passed.length() < 1){
+			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Format: /tphere <username>"));
+		}else if(!server.getPlayer(passed).isPresent()){
+			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Player \"" + passed + "\" does not exist."));
+		}else{
+			destination = server.getPlayer(passed).get();
+			destination.setLocation(caller.getLocation());
+		}		
 		return Optional.of(CommandResult.empty());
 	}
 
-	public boolean testPermission(CommandSource arg0) {
+	public boolean testPermission(CommandSource cS) {
 		logger.info("testPermission");
 		//I guess if it needs, then return true.
-		return true;
+		return cS.hasPermission("Spongy.tphere");
 	}
 }

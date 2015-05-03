@@ -70,9 +70,7 @@ public class Broadcast implements CommandCallable {
 		}
 	}
 
-	public boolean testPermission(CommandSource arg0) {
-		// TODO Auto-generated method stub
-		logger.info("testPermission");
-		return true;
+	public boolean testPermission(CommandSource cS) {
+		return cS.hasPermission("Spongy.broadcast");
 	}
 }

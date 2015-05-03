@@ -57,9 +57,7 @@ public class actAsConsole implements CommandCallable {
 		return Optional.of(CommandResult.empty());
 	}
 
-	public boolean testPermission(CommandSource arg0) {
-		logger.info("testPermission");
-		//I guess if it needs, then return true.
-		return true;
+	public boolean testPermission(CommandSource cS) {
+		return cS.hasPermission("Spongy.actAsConsole");
 	}
 }

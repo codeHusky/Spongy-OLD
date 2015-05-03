@@ -54,7 +54,7 @@ public class BroadcastCMD implements CommandCallable {
 	}
 
 	public Optional<CommandResult> process(CommandSource cS, String passed){
-		int spaceCount = passed.replaceAll("\\s+","").split(" ").length-1;
+		int spaceCount = passed.split(" ").length-1;
 		if(spaceCount > 0){
 			String channel = passed.split(" ")[0];
 			String content = passed.replace(channel + " ","");
@@ -62,10 +62,10 @@ public class BroadcastCMD implements CommandCallable {
 			game.getServer().broadcastMessage(Texts.of("§4" + channel + " §r" + content));
 			return Optional.of(CommandResult.success());
 		}else if(passed.replaceAll("\\s+","").length() == 0){
-			cS.sendMessage(Texts.of("&4Error: &cFormat: /broadcast <channel name> <content>"));
+			cS.sendMessage(Texts.of("§4Error: §cFormat: /broadcast <channel name> <content>"));
 			return Optional.of(CommandResult.empty());
 		}else{
-			cS.sendMessage(Texts.of("&4Error: &cYou need to have more than one parameter."));
+			cS.sendMessage(Texts.of("§4Error: §cYou need to have more than one parameter."));
 			return Optional.of(CommandResult.empty());
 		}
 	}

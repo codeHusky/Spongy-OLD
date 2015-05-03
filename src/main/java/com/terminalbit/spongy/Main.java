@@ -15,6 +15,8 @@ import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 import org.spongepowered.api.event.message.MessageEvent;
+import org.spongepowered.api.event.state.InitializationEvent;
+import org.spongepowered.api.event.state.PreInitializationEvent;
 import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.command.CommandService;
@@ -35,7 +37,6 @@ public class Main {
 	@Inject
 	private Game game;
 	
-	@Inject
 	@DefaultConfig(sharedRoot = false)
 	private ConfigurationLoader<CommentedConfigurationNode> configManager;
 
@@ -44,15 +45,9 @@ public class Main {
 	private File defaultConfig;
 	
 	@Subscribe
-	public void onServerStart(ServerStartedEvent event){
+	public void PreInitialization(PreInitializationEvent event){
 		Plugin plugin = Main.class.getAnnotation(Plugin.class);
 		logger.info("Spongy v" + plugin.version() + " is starting...");
-		CommandService cmdService = game.getCommandDispatcher();
-		cmdService.register(this, new Broadcast(logger, game), "broadcast");
-		cmdService.register(this, new actAsConsole(logger, game), "asConsole");
-		cmdService.register(this, new simpleTP(logger, game), "tp");
-		cmdService.register(this, new simpleTPHERE(logger, game), "tphere");
-		/* Load up config */
 		ConfigurationNode config = null;
 
 		try {
@@ -70,7 +65,19 @@ public class Main {
 		} catch (IOException exception) {
 		    exception.printStackTrace();
 		}
-		/* YAY WE DID IT! */
+	}
+	
+	@Subscribe
+	public void Initalization(InitializationEvent event){
+		CommandService cmdService = game.getCommandDispatcher();
+		cmdService.register(this, new Broadcast(logger, game), "broadcast");
+		cmdService.register(this, new actAsConsole(logger, game), "asConsole");
+		cmdService.register(this, new simpleTP(logger, game), "tp");
+		cmdService.register(this, new simpleTPHERE(logger, game), "tphere");	
+	}
+	
+	@Subscribe
+	public void onServerStart(ServerStartedEvent event){
 		logger.info("Spongy has started.");
 		logger.info("-------------------------------------");
 		logger.info("Spongy was created by Lokio27.");

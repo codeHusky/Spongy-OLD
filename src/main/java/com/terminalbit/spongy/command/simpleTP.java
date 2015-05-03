@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandCallable;
@@ -53,6 +54,9 @@ public class simpleTP implements CommandCallable {
 
 	public Optional<CommandResult> process(CommandSource cS, String passed){
 		game.getCommandDispatcher().process(game.getServer().getConsole(), "minecraft:tp " + cS.getName() + " " + passed);
+		for(Player player : game.getServer().getOnlinePlayers()) {
+			player.hasPermission("Spongy.tp");
+		}
 		return Optional.of(CommandResult.empty());
 	}
 

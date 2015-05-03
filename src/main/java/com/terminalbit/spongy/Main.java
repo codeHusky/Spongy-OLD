@@ -52,6 +52,7 @@ public class Main {
 
 		try {
 		     if (!defaultConfig.exists()) {
+		    	defaultConfig.getParentFile().mkdirs();
 		        defaultConfig.createNewFile();
 		        config = configManager.load();
 

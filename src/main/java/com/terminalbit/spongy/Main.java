@@ -3,16 +3,17 @@ package com.terminalbit.spongy;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 import org.spongepowered.api.event.message.MessageEvent;
-//import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.command.CommandService;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
 
 import com.google.inject.Inject;
 
-@Plugin(id = "Spongy", name="Spongy", version="0.1.1")
+@Plugin(id = "Spongy", name="Spongy", version="0.1.2")
 public class Main {
 	@Inject
 	private Logger logger;
@@ -36,18 +37,18 @@ public class Main {
 		logger.info("to the Github Repo.");
 		logger.info("-------------------------------------");
 	}
-	//@Subscribe
-	//public void onPlayerConnection(PlayerJoinEvent event) {
+	@Subscribe
+	public void onPlayerConnection(PlayerJoinEvent event) {
 		//String username = event.getPlayer().getName();
-		/*logger.info("Player " + username + " joined.");
-		game.getServer().broadcastMessage(Texts.of("/broadcast TEST1 TEST2"));*/
-	//}
+		//logger.info("Player " + username + " joined.");
+		//game.getServer().broadcastMessage(Texts.of("/broadcast TEST1 TEST2"));
+		//event.getPlayer().sendMessage(Texts.of(TextColors.GOLD,""));
+	}
+	@SuppressWarnings("deprecation")
 	@Subscribe
 	public void onPlayerMessage(MessageEvent event) {
 		//Replace all colorcodes with actual ones
 		String original = Texts.toPlain(event.getMessage());
-		//Thanks to Deamon from Sponge Forums for helping with this feature.
-		original = original.replaceAll("&([0-9a-fA-FkKlLmMnNoOrR])", "§$1");
-		event.setMessage(Texts.of(original));
+		event.setMessage(Texts.of(Texts.replaceCodes(original,'&')));
 	}
 }

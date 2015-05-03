@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
@@ -58,14 +59,14 @@ public class BroadcastCMD implements CommandCallable {
 		if(spaceCount > 0){
 			String channel = passed.split(" ")[0];
 			String content = passed.replace(channel + " ","");
-			cS.sendMessage(Texts.of("§eYou Broadcasted \"§r" + content + "§e\""));
+			cS.sendMessage(Texts.of(TextColors.GOLD,"You Broadcasted \"",TextColors.RESET, content, TextColors.GOLD,"\""));
 			game.getServer().broadcastMessage(Texts.of("§4" + channel + " §r" + content));
 			return Optional.of(CommandResult.success());
 		}else if(passed.replaceAll("\\s+","").length() == 0){
-			cS.sendMessage(Texts.of("§4Error: §cFormat: /broadcast <channel name> <content>"));
+			cS.sendMessage(Texts.of(TextColors.DARK_RED, "Error: ", TextColors.RED, "Format: /broadcast <channel name> <content>"));
 			return Optional.of(CommandResult.empty());
 		}else{
-			cS.sendMessage(Texts.of("§4Error: §cYou need to have more than one parameter."));
+			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED ,"You need to have more than one parameter."));
 			return Optional.of(CommandResult.empty());
 		}
 	}

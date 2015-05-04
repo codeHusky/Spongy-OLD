@@ -2,10 +2,8 @@ package com.terminalbit.spongy;
 
 import java.io.File;
 import java.io.IOException;
-
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import org.slf4j.Logger;
@@ -29,14 +27,15 @@ import com.terminalbit.spongy.command.actAsConsole;
 import com.terminalbit.spongy.command.simpleTP;
 import com.terminalbit.spongy.command.simpleTPHERE;
 
-@Plugin(id = "Spongy", name="Spongy", version="0.1.2")
-public class Main {
+@Plugin(id = "Spongy", name="Spongy", version="0.2")
+public class Main {	
 	@Inject
 	private Logger logger;
 	
 	@Inject
 	private Game game;
 	
+	@Inject
 	@DefaultConfig(sharedRoot = false)
 	private ConfigurationLoader<CommentedConfigurationNode> configManager;
 
@@ -44,24 +43,26 @@ public class Main {
 	@DefaultConfig(sharedRoot = false)
 	private File defaultConfig;
 	
+	private boolean useJoinSound;
+	
 	@Subscribe
 	public void PreInitialization(PreInitializationEvent event){
 		Plugin plugin = Main.class.getAnnotation(Plugin.class);
 		logger.info("Spongy v" + plugin.version() + " is starting...");
 		ConfigurationNode config = null;
-
 		try {
 		     if (!defaultConfig.exists()) {
 		    	defaultConfig.getParentFile().mkdirs();
 		        defaultConfig.createNewFile();
 		        config = configManager.load();
-
-		        config.getNode("version").setValue(1);
-		        config.getNode("doStuff").setValue(true);
-		        config.getNode("doMoreStuff").setValue(false);
+		        config.getNode("version").setValue(plugin.version());
+				config.getNode("playJoinSound").setValue(false);
 		        configManager.save(config);
 		    }
 		    config = configManager.load();
+		    config.getNode("version").setValue(plugin.version());
+		    useJoinSound = config.getNode("playJoinSound").getBoolean();
+	        configManager.save(config);
 
 		} catch (IOException exception) {
 		    exception.printStackTrace();
@@ -94,10 +95,12 @@ public class Main {
 		for(Player player : game.getServer().getOnlinePlayers()){
 			//Waiting for implementation...
 			//player.playSound(SoundTypes.ORB_PICKUP,player.getLocation().getPosition(),1);
-			double x = player.getLocation().getX();
-			double y = player.getLocation().getY();
-			double z = player.getLocation().getZ();
-			game.getCommandDispatcher().process(game.getServer().getConsole(), "playsound random.orb " + player.getName() + " " + x + " " + y + " " + z + " 0.5");
+			if(useJoinSound){
+				double x = player.getLocation().getX();
+				double y = player.getLocation().getY();
+				double z = player.getLocation().getZ();
+				game.getCommandDispatcher().process(game.getServer().getConsole(), "playsound random.orb " + player.getName() + " " + x + " " + y + " " + z + " 0.5");
+			}
 		}
 	}
 	@SuppressWarnings("deprecation")

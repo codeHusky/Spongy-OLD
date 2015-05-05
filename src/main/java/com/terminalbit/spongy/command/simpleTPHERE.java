@@ -63,6 +63,7 @@ public class simpleTPHERE implements CommandCallable {
 		}else if(!server.getPlayer(passed).isPresent()){
 			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Player \"" + passed + "\" does not exist."));
 		}else{
+			logger.info(cS.getName() + " brought " + passed + " to themself.");
 			destination = server.getPlayer(passed).get();
 			destination.setLocation(caller.getLocation());
 		}		

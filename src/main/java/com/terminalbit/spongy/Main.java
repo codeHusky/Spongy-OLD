@@ -2,6 +2,7 @@ package com.terminalbit.spongy;
 
 import java.io.File;
 import java.io.IOException;
+
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -23,11 +24,13 @@ import org.spongepowered.api.text.Texts;
 
 import com.google.inject.Inject;
 import com.terminalbit.spongy.command.Broadcast;
+import com.terminalbit.spongy.command.Warp;
 import com.terminalbit.spongy.command.actAsConsole;
+import com.terminalbit.spongy.command.setWarp;
 import com.terminalbit.spongy.command.simpleTP;
 import com.terminalbit.spongy.command.simpleTPHERE;
 
-@Plugin(id = "Spongy", name="Spongy", version="0.2")
+@Plugin(id = "Spongy", name="Spongy", version="0.3")
 public class Main {	
 	@Inject
 	private Logger logger;
@@ -62,7 +65,7 @@ public class Main {
 		    config = configManager.load();
 		    config.getNode("version").setValue(plugin.version());
 		    useJoinSound = config.getNode("playJoinSound").getBoolean();
-	        configManager.save(config);
+		    configManager.save(config);
 
 		} catch (IOException exception) {
 		    exception.printStackTrace();
@@ -76,6 +79,8 @@ public class Main {
 		cmdService.register(this, new actAsConsole(logger, game), "asConsole");
 		cmdService.register(this, new simpleTP(logger, game), "tp");
 		cmdService.register(this, new simpleTPHERE(logger, game), "tphere");	
+		cmdService.register(this, new setWarp(logger, game,configManager), "setwarp");	
+		cmdService.register(this, new Warp(logger, game,configManager), "warp");	
 	}
 	
 	@Subscribe

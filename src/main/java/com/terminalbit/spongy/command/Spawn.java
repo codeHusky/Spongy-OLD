@@ -18,11 +18,11 @@ import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 
-public class setWarp implements CommandCallable {
+public class Spawn implements CommandCallable {
 	private Logger logger;
 	private Game game;
 	private Text hT = Texts.of("Help Text");
@@ -33,7 +33,7 @@ public class setWarp implements CommandCallable {
 	private ConfigurationLoader<CommentedConfigurationNode> configManager;
 	private ConfigurationNode config = null;
 	
-    public setWarp(Logger logger, Game game, ConfigurationLoader<CommentedConfigurationNode> configManager) {
+    public Spawn(Logger logger, Game game, ConfigurationLoader<CommentedConfigurationNode> configManager) {
     	//Gets the, you know, stuff from the main class.
     	this.logger = logger;
     	this.game = game;
@@ -63,37 +63,23 @@ public class setWarp implements CommandCallable {
 	}
 
 	public Optional<CommandResult> process(CommandSource cS, String passed){
-    	try {
-			config = configManager.load();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		passed = passed.toLowerCase();
 		try{
-		if(Integer.toString(Integer.parseInt(passed)).equals(passed)){
-			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Your warp cannot be just a number."));
-			return Optional.of(CommandResult.empty());
-		}
-		}catch(NumberFormatException e){}
-		if(passed.contains(" ")){
-			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Your warp should not contain spaces."));
-		}else if(passed.length() > 0) {
-			Location playerLoco = game.getServer().getPlayer(cS.getName()).get().getLocation();
-			Vector3d playerRot = game.getServer().getPlayer(cS.getName()).get().getRotation();
-			config.getNode("warps",passed,"position","x").setValue(playerLoco.getX());
-			config.getNode("warps",passed,"position","y").setValue(playerLoco.getY());
-			config.getNode("warps",passed,"position","z").setValue(playerLoco.getZ());
-			config.getNode("warps",passed,"rotation","x").setValue(playerRot.getX());
-			config.getNode("warps",passed,"rotation","y").setValue(playerRot.getY());
-			config.getNode("warps",passed,"rotation","z").setValue(playerRot.getZ());
-			try {
+			World playerWorld = game.getServer().getPlayer(cS.getName()).get().getWorld();
+			config = configManager.load();
+			if(config.getNode("spawn").isVirtual()){
+				cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ",TextColors.RED, "There is no spawn set. Please ask a server administrator to set one."));
 				configManager.save(config);
-			} catch (IOException e) {
+				return Optional.of(CommandResult.empty());
 			}
-			logger.info(cS.getName() + " created/updated the warp \"" + passed + "\"");
-			cS.sendMessage(Texts.of(TextColors.GOLD,"Success: ", TextColors.YELLOW, "The warp \"" + passed + "\" was set."));
-		} else {
-			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Format: /setwarp <warpname>"));
+			double x = config.getNode("spawn","position","X").getFloat();
+			double y = config.getNode("spawn","position","Y").getFloat();
+			double z = config.getNode("spawn","position","Z").getFloat();
+			Location spawn = new Location(playerWorld,x,y,z);
+			cS.sendMessage(Texts.of(TextColors.GOLD,"Success: ",TextColors.YELLOW,"Sending you to the spawn."));
+			game.getServer().getPlayer(cS.getName()).get().setLocation(spawn);
+			configManager.save(config);
+		}catch(IOException e){
+			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ",TextColors.RED, "An error occured."));
 		}
 		return Optional.of(CommandResult.empty());
 	}

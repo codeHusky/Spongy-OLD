@@ -39,11 +39,6 @@ public class Warp implements CommandCallable {
     	this.logger = logger;
     	this.game = game;
     	this.configManager = configManager;
-    	try {
-			this.config = this.configManager.load();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
     }
 
     public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
@@ -69,8 +64,43 @@ public class Warp implements CommandCallable {
 	}
 
 	public Optional<CommandResult> process(CommandSource cS, String passed){
-		if(passed.contains(" ")){
+    	try {
+			config = configManager.load();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		passed = passed.toLowerCase();
+		try{
+		if(Integer.toString(Integer.parseInt(passed)).equals(passed)){
+			int startNum = 0;
+			try{
+				startNum = Integer.parseInt(passed) - 1;
+			}catch(NumberFormatException e){}
+			cS.sendMessage(Texts.of(TextColors.BLUE,"Listing warps " + (startNum + 1) + " thru " + (startNum + 5) + ":"));
+			int warpNum = 0;
+			for(Object child: config.getNode("warps").getChildrenMap().keySet()){
+				if(warpNum < (5 + startNum)&&warpNum>=startNum){
+					cS.sendMessage(Texts.of(TextColors.GOLD,"   Warp " + (warpNum+1) + ": ", TextColors.YELLOW,child.toString()));
+				}
+				warpNum++;
+			}
+			return Optional.of(CommandResult.empty());
+		}
+		}catch(NumberFormatException e){}
+		if(passed.length() <= 0){
+			int startNum = 0;
+			cS.sendMessage(Texts.of(TextColors.BLUE,"Listing warps " + (startNum + 1) + " thru " + (startNum + 5) + ":"));
+			int warpNum = 0;
+			for(Object child: config.getNode("warps").getChildrenMap().keySet()){
+				if(warpNum < (5 + startNum)&&warpNum>=startNum){
+					cS.sendMessage(Texts.of(TextColors.GOLD,"   Warp " + (warpNum+1) + ": ", TextColors.YELLOW,child.toString()));
+				}
+				warpNum++;
+			}
+		}else if(passed.contains(" ")){
 			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Your warp should not contain spaces."));
+		}else if(config.getNode("warps",passed).isVirtual()){
+			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "The warp \"" + passed + "\" does not exist."));
 		}else if(passed.length() > 0) {
 			Location destinationPos = new Location(
 					game.getServer().getPlayer(cS.getName()).get().getWorld(),

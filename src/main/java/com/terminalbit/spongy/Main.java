@@ -24,8 +24,11 @@ import org.spongepowered.api.text.Texts;
 
 import com.google.inject.Inject;
 import com.terminalbit.spongy.command.Broadcast;
+import com.terminalbit.spongy.command.Spawn;
 import com.terminalbit.spongy.command.Warp;
 import com.terminalbit.spongy.command.actAsConsole;
+import com.terminalbit.spongy.command.reloadConfig;
+import com.terminalbit.spongy.command.setSpawn;
 import com.terminalbit.spongy.command.setWarp;
 import com.terminalbit.spongy.command.simpleTP;
 import com.terminalbit.spongy.command.simpleTPHERE;
@@ -47,12 +50,11 @@ public class Main {
 	private File defaultConfig;
 	
 	private boolean useJoinSound;
-	
+	ConfigurationNode config = null;
 	@Subscribe
 	public void PreInitialization(PreInitializationEvent event){
 		Plugin plugin = Main.class.getAnnotation(Plugin.class);
 		logger.info("Spongy v" + plugin.version() + " is starting...");
-		ConfigurationNode config = null;
 		try {
 		     if (!defaultConfig.exists()) {
 		    	defaultConfig.getParentFile().mkdirs();
@@ -76,15 +78,33 @@ public class Main {
 	public void Initalization(InitializationEvent event){
 		CommandService cmdService = game.getCommandDispatcher();
 		cmdService.register(this, new Broadcast(logger, game), "broadcast");
-		cmdService.register(this, new actAsConsole(logger, game), "asConsole");
+		cmdService.register(this, new actAsConsole(logger, game), "asconsole");
 		cmdService.register(this, new simpleTP(logger, game), "tp");
 		cmdService.register(this, new simpleTPHERE(logger, game), "tphere");	
 		cmdService.register(this, new setWarp(logger, game,configManager), "setwarp");	
 		cmdService.register(this, new Warp(logger, game,configManager), "warp");	
+		cmdService.register(this, new reloadConfig(logger, game,configManager), "reloadSpongyConfig");
+		cmdService.register(this, new Spawn(logger, game,configManager), "spawn");
+		cmdService.register(this, new setSpawn(logger, game,configManager), "setspawn");
 	}
 	
 	@Subscribe
 	public void onServerStart(ServerStartedEvent event){
+		/*try {
+			config = configManager.load();
+			if(config.getNode("spawn").isVirtual()){
+				logger.info("Assigning spawn location.");
+				logger.info("Assuming default world is called \"world\" to work around an unimplemented method.")
+				World world = game.getServer().getWorld("world").get();
+				Location worldSpawn = world.getSpawnLocation();
+				config.getNode("spawn","position","X").setValue(worldSpawn.getX());
+				config.getNode("spawn","position","Y").setValue(worldSpawn.getY());
+				config.getNode("spawn","position","Z").setValue(worldSpawn.getZ());
+			}
+			configManager.save(config);
+		} catch (IOException e) {
+			logger.error("Failed to set spawn location. ;( I cri.");
+		}*/
 		logger.info("Spongy has started.");
 		logger.info("-------------------------------------");
 		logger.info("Spongy was created by Lokio27.");

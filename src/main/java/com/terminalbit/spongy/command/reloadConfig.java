@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
@@ -17,26 +16,24 @@ import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.world.Location;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 
-public class setWarp implements CommandCallable {
+public class reloadConfig implements CommandCallable {
 	private Logger logger;
-	private Game game;
+	//private Game game;
 	private Text hT = Texts.of("Help Text");
 	private Text dT = Texts.of("Description!");
 	private Text usage = Texts.of("Usage!! :D");
 	private Optional<Text> help = Optional.of(hT);
 	private Optional<Text> desc = Optional.of(dT);
 	private ConfigurationLoader<CommentedConfigurationNode> configManager;
-	private ConfigurationNode config = null;
+	//private ConfigurationNode config = null;
 	
-    public setWarp(Logger logger, Game game, ConfigurationLoader<CommentedConfigurationNode> configManager) {
+    public reloadConfig(Logger logger, Game game, ConfigurationLoader<CommentedConfigurationNode> configManager) {
     	//Gets the, you know, stuff from the main class.
     	this.logger = logger;
-    	this.game = game;
+    	//this.game = game;
     	this.configManager = configManager;
     }
 
@@ -63,37 +60,16 @@ public class setWarp implements CommandCallable {
 	}
 
 	public Optional<CommandResult> process(CommandSource cS, String passed){
-    	try {
-			config = configManager.load();
+		Boolean didFail = false;
+		try {
+			configManager.load();
 		} catch (IOException e) {
-			e.printStackTrace();
+			didFail = true;
 		}
-		passed = passed.toLowerCase();
-		try{
-		if(Integer.toString(Integer.parseInt(passed)).equals(passed)){
-			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Your warp cannot be just a number."));
-			return Optional.of(CommandResult.empty());
-		}
-		}catch(NumberFormatException e){}
-		if(passed.contains(" ")){
-			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Your warp should not contain spaces."));
-		}else if(passed.length() > 0) {
-			Location playerLoco = game.getServer().getPlayer(cS.getName()).get().getLocation();
-			Vector3d playerRot = game.getServer().getPlayer(cS.getName()).get().getRotation();
-			config.getNode("warps",passed,"position","x").setValue(playerLoco.getX());
-			config.getNode("warps",passed,"position","y").setValue(playerLoco.getY());
-			config.getNode("warps",passed,"position","z").setValue(playerLoco.getZ());
-			config.getNode("warps",passed,"rotation","x").setValue(playerRot.getX());
-			config.getNode("warps",passed,"rotation","y").setValue(playerRot.getY());
-			config.getNode("warps",passed,"rotation","z").setValue(playerRot.getZ());
-			try {
-				configManager.save(config);
-			} catch (IOException e) {
-			}
-			logger.info(cS.getName() + " created/updated the warp \"" + passed + "\"");
-			cS.sendMessage(Texts.of(TextColors.GOLD,"Success: ", TextColors.YELLOW, "The warp \"" + passed + "\" was set."));
-		} else {
-			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Format: /setwarp <warpname>"));
+		if(didFail){
+			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "The config failed to reload."));
+		}else{
+			cS.sendMessage(Texts.of(TextColors.GOLD,"Success: ", TextColors.YELLOW, "The config was reloaded."));
 		}
 		return Optional.of(CommandResult.empty());
 	}

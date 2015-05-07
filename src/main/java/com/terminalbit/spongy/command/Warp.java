@@ -115,6 +115,7 @@ public class Warp implements CommandCallable {
 			);
 			Player caller = game.getServer().getPlayer(cS.getName()).get();
 			caller.setLocationAndRotation(destinationPos, destinationRot);
+			//caller.setLocationSafely(destinationPos);
 			logger.info(cS.getName() + " warped to " + passed);
 			cS.sendMessage(Texts.of(TextColors.GOLD,"Success: ", TextColors.YELLOW, "Sending you to \"" + passed + "\"."));
 		} else {

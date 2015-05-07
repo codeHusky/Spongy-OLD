@@ -62,9 +62,10 @@ public class simpleTP implements CommandCallable {
 		if(passed.length() < 1){
 			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Format: /tp <username>"));
 		}else if(!server.getPlayer(passed).isPresent()){
-			logger.info(cS.getName() + " teleported to " + passed);
 			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Player \"" + passed + "\" does not exist."));
 		}else{
+			logger.info(cS.getName() + " teleported to " + passed);
+			//destination.getWorld().getBlock(destination.getLocation().getBlock());
 			destination = server.getPlayer(passed).get();
 			caller.setLocation(destination.getLocation());
 		}	

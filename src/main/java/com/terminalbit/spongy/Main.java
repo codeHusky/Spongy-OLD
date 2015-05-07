@@ -85,7 +85,7 @@ public class Main {
 		CommandSpec broadcastSpec = CommandSpec.builder()
 				.setDescription(Texts.of("Broadcast Desc"))
 				//.setPermission("spongy.chat.broadcast") <-- Let's not... :)
-				.setArguments(string(Texts.of("broadcaster")),remainingJoinedStrings(Texts.of("content")))
+				.setArguments(optional(remainingJoinedStrings(Texts.of("all"))))
 				.setExecutor(new Broadcast())
 				.build();
 		cmdService.register(this, broadcastSpec, "broadcast");

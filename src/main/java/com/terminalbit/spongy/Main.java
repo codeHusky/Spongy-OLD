@@ -30,6 +30,7 @@ import com.google.inject.Inject;
 import com.terminalbit.spongy.command.Broadcast;
 import com.terminalbit.spongy.command.Me;
 import com.terminalbit.spongy.command.Nick;
+import com.terminalbit.spongy.command.Party;
 import com.terminalbit.spongy.command.Spawn;
 import com.terminalbit.spongy.command.Warp;
 import com.terminalbit.spongy.command.actAsConsole;
@@ -126,6 +127,8 @@ public class Main {
 				"nick");
 		cmdService.register(this, new Me(logger, game, userConfig),
 				"me");
+		cmdService.register(this, new Party(logger, game, userConfig),
+				"party");
 	}
 
 	@Subscribe
@@ -188,10 +191,12 @@ public class Main {
 			//temporary nickname implementation
 			//sloppy as crap.
 			//also need a config entry on how people want this to be formatted.
-		if(!thisConfig.getNode(event.getSource().getIdentifier(),"nickname").isVirtual()){
-			String edited = original.replace("<" + event.getSource().getName() + ">",thisConfig.getNode(event.getSource().getIdentifier(),"nickname").getString() + "&r:");
+			String username = thisConfig.getNode(event.getSource().getIdentifier(),"nickname").getString();
+			if(username.equals("null")){
+				username = event.getSource().getName();
+			}
+			String edited = original.replace("<" + event.getSource().getName() + ">",username + "&r:");
 			original = edited;
-		}
 		}catch(NullPointerException e){
 			logger.error("Failed to replace nickname");
 		}

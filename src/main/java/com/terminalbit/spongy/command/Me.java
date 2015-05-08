@@ -66,6 +66,9 @@ public class Me implements CommandCallable {
 				cS.sendMessage(Texts.of("Usage: /me <content>"));
 			}else {
 				String nickname = config.getNode(cS.getIdentifier(),"nickname").getString();
+				if(nickname.equals("null")){
+					nickname = cS.getName();
+				}
 				game.getServer().broadcastMessage(Texts.of(Texts.replaceCodes("&5* " + nickname + "&r&5 " + passed, '&')));
 			}
 			userConfig.save(config);

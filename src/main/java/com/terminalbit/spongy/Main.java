@@ -21,7 +21,6 @@ import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.command.CommandService;
 import org.spongepowered.api.service.config.ConfigDir;
-import org.spongepowered.api.service.config.DefaultConfig;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
@@ -29,6 +28,8 @@ import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
 import com.google.inject.Inject;
 import com.terminalbit.spongy.command.Broadcast;
+import com.terminalbit.spongy.command.Me;
+import com.terminalbit.spongy.command.Nick;
 import com.terminalbit.spongy.command.Spawn;
 import com.terminalbit.spongy.command.Warp;
 import com.terminalbit.spongy.command.actAsConsole;
@@ -49,7 +50,7 @@ public class Main {
 	public static Main access;
 	
 	@Inject
-	@DefaultConfig(sharedRoot = false)
+	@ConfigDir(sharedRoot = false)
 	private File configDir;
 	
 	//private File mainConfigFile = new File(this.configDir, "config.conf");
@@ -121,6 +122,10 @@ public class Main {
 				"spawn");
 		cmdService.register(this, new setSpawn(logger, game, mainConfig),
 				"setspawn");
+		cmdService.register(this, new Nick(logger, game, userConfig),
+				"nick");
+		cmdService.register(this, new Me(logger, game, userConfig),
+				"me");
 	}
 
 	@Subscribe
@@ -172,6 +177,28 @@ public class Main {
 	public void onMessage(MessageEvent event) {
 		// Replace all colorcodes with actual ones
 		String original = Texts.toPlain(event.getMessage());
+		ConfigurationNode thisConfig = null;
+		try {
+			thisConfig = userConfig.load();
+		} catch (IOException e) {
+			logger.error("Failed to load userConfig");
+		}
+		logger.info(event.getSource().getIdentifier());
+		try{
+			//temporary nickname implementation
+			//sloppy as crap.
+			//also need a config entry on how people want this to be formatted.
+		if(!thisConfig.getNode(event.getSource().getIdentifier(),"nickname").isVirtual()){
+			String edited = original.replace("<" + event.getSource().getName() + ">",thisConfig.getNode(event.getSource().getIdentifier(),"nickname").getString() + "&r:");
+			original = edited;
+		}
+		}catch(NullPointerException e){
+			logger.error("Failed to replace nickname");
+		}
+		try {
+			userConfig.save(thisConfig);
+		} catch (IOException e) {
+		}
 		// TODO: Replace with a better method of parsing.
 		event.setMessage(Texts.of(Texts.replaceCodes(original, '&')));
 	}

@@ -1,6 +1,8 @@
 eclipse.preferences.version=1
 encoding//src/main/java/com/terminalbit/spongy/command/Broadcast.java=UTF-8
+encoding//src/main/java/com/terminalbit/spongy/command/Me.java=UTF-8
 encoding//src/main/java/com/terminalbit/spongy/command/NewCommand.java=UTF-8
+encoding//src/main/java/com/terminalbit/spongy/command/Nick.java=UTF-8
 encoding//src/main/java/com/terminalbit/spongy/command/Spawn.java=UTF-8
 encoding//src/main/java/com/terminalbit/spongy/command/Warp.java=UTF-8
 encoding//src/main/java/com/terminalbit/spongy/command/actAsConsole.java=UTF-8

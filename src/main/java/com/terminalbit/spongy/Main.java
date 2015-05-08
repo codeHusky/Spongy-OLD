@@ -47,44 +47,49 @@ public class Main {
 	public Game game;
 
 	public static Main access;
-
-	@Inject
-	@DefaultConfig(sharedRoot = false)
-	public ConfigurationLoader<CommentedConfigurationNode> configManager;
 	
 	@Inject
 	@DefaultConfig(sharedRoot = false)
 	private File configDir;
 	
-	@ConfigDir(sharedRoot = false)
-	private File userConfigFile = new File(this.configDir, "users.conf");
-
-	public ConfigurationLoader<CommentedConfigurationNode> userConfigManager = HoconConfigurationLoader.builder().setFile(userConfigFile).build();
-	public ConfigurationNode userConfig = null;
+	//private File mainConfigFile = new File(this.configDir, "config.conf");
+	//private File userConfigFile = new File(this.configDir, "user.conf");
+	
+	public ConfigurationLoader<CommentedConfigurationNode> mainConfig = null;
+	public ConfigurationLoader<CommentedConfigurationNode> userConfig = null;
 
 
 	private boolean useJoinSound;
 	public ConfigurationNode config = null;
 
+	public ConfigurationLoader<CommentedConfigurationNode> getLoader(String configName) throws IOException {
+	    File configFile = new File(this.configDir, configName);
+	    if(!configFile.exists()){
+	    	configFile.getParentFile().mkdirs();
+	    	configFile.createNewFile();
+	    }
+	    return HoconConfigurationLoader.builder().setFile(configFile).build();
+	}
+	
 	@Subscribe
 	public void PreInitialization(PreInitializationEvent event) {
+		try {
+			mainConfig = this.getLoader("config.conf");
+			userConfig = this.getLoader("users.conf");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Plugin plugin = Main.class.getAnnotation(Plugin.class);
 		logger.info("Spongy v" + plugin.version() + " is starting...");
 		try {
-			userConfig = userConfigManager.load();
-			userConfigManager.save(userConfig);
-			if (!configDir.exists()) {
-				configDir.getParentFile().mkdirs();
-				configDir.createNewFile();
-				config = configManager.load();
-				config.getNode("version").setValue(plugin.version());
-				config.getNode("playJoinSound").setValue(false);
-				configManager.save(config);
-			}
-			config = configManager.load();
+			config = mainConfig.load();
 			config.getNode("version").setValue(plugin.version());
+			if(config.getNode("playJoinSound").isVirtual()){
+				config.getNode("playJoinSound").setValue(false);
+			}
 			useJoinSound = config.getNode("playJoinSound").getBoolean();
-			configManager.save(config);
+			mainConfig.save(config);
 
 		} catch (IOException exception) {
 			exception.printStackTrace();
@@ -105,16 +110,16 @@ public class Main {
 		cmdService.register(this, new actAsConsole(logger, game), "asconsole");
 		cmdService.register(this, new simpleTP(logger, game), "tp");
 		cmdService.register(this, new simpleTPHERE(logger, game), "tphere");
-		cmdService.register(this, new setWarp(logger, game, configManager),
+		cmdService.register(this, new setWarp(logger, game, mainConfig),
 				"setwarp");
 		cmdService
-				.register(this, new Warp(logger, game, configManager), "warp");
+				.register(this, new Warp(logger, game, mainConfig), "warp");
 		cmdService.register(this,
-				new reloadConfig(logger, game, configManager),
+				new reloadConfig(logger, game, mainConfig),
 				"reloadSpongyConfig");
-		cmdService.register(this, new Spawn(logger, game, configManager),
+		cmdService.register(this, new Spawn(logger, game, mainConfig),
 				"spawn");
-		cmdService.register(this, new setSpawn(logger, game, configManager),
+		cmdService.register(this, new setSpawn(logger, game, mainConfig),
 				"setspawn");
 	}
 

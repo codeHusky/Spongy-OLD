@@ -11,10 +11,12 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.manipulators.DisplayNameData;
+import org.spongepowered.api.data.manipulators.tileentities.SignData;
 //import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.block.tile.SignChangeEvent;
 import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.state.InitializationEvent;
@@ -28,6 +30,8 @@ import org.spongepowered.api.util.command.spec.CommandSpec;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 import com.terminalbit.spongy.command.Broadcast;
 import com.terminalbit.spongy.command.Me;
@@ -200,14 +204,6 @@ public class Main {
 			//sloppy as crap.
 			//also need a config entry on how people want this to be formatted.
 			String username = thisConfig.getNode(event.getSource().getIdentifier(),"nickname").getString();
-			DisplayNameData dND = game.getServer().getPlayer(event.getSource().getName()).get().getData(DisplayNameData.class).get();
-			dND.setDisplayName(Texts.of(username));
-			dND.setCustomNameVisible(true);
-			game.getServer().getPlayer(event.getSource().getName()).get().offer(dND);
-			//if(username.equals("null")){
-			//	username = event.getSource().getName();
-			//}
-			//String edited = original.replace("<" + event.getSource().getName() + ">",event.getSource().getName() + "&f:");
 			String edited = original.replace(event.getSource().getName(), username);
 			original = edited;	
 		}catch(NullPointerException e){
@@ -219,5 +215,21 @@ public class Main {
 		// TODO: Replace with a better method of parsing.
 		logger.info("In /config/Spongy/config.conf, please change \"imcom");
 		event.setMessage(Texts.of(Texts.fromLegacy(original, '&')));
+	}
+	
+	@SuppressWarnings("deprecation")
+	@Subscribe
+	public void onSignEdit(SignChangeEvent event){
+		//le epic sause.
+		SignData BlockLoco = event.getSign().getSignData();
+		String line0 = BlockLoco.getLine(0).toString();
+		String line1 = BlockLoco.getLine(1).toString();
+		String line2 = BlockLoco.getLine(2).toString();
+		String line3 = BlockLoco.getLine(3).toString();
+		BlockLoco.setLine(0, Texts.fromLegacy(line0,'&'));
+		BlockLoco.setLine(0, Texts.fromLegacy(line1,'&'));
+		BlockLoco.setLine(0, Texts.fromLegacy(line2,'&'));
+		BlockLoco.setLine(0, Texts.fromLegacy(line3,'&'));
+		event.getSign().offer(BlockLoco);
 	}
 }

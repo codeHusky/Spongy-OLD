@@ -8,8 +8,10 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.data.manipulators.entities.FuseData;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.explosive.PrimedTNT;
@@ -75,16 +77,31 @@ public class Party implements CommandCallable {
 
 	public Optional<CommandResult> process(CommandSource cS, String passed){
 		//do stuff here when command is fired
+		try {
+			config = configManager.load();
+		} catch (IOException e) {}
+		if(config.getNode("enableParty").getBoolean()){
+		int bombCount = 10;
+		if(Integer.toString(Integer.parseInt(passed)).equals(passed)){
+			bombCount = Integer.parseInt(passed);
+		}
 		Player caller = game.getServer().getPlayer(cS.getName()).get();
 		World playerWorld = caller.getWorld();
 		Location entityLocation = caller.getLocation();
-		for(int i = 0; i < 50; i++){
-		Optional<Entity> entity = playerWorld.createEntity(EntityTypes.FIREBALL, new Vector3d(entityLocation.getX(),entityLocation.getY(),entityLocation.getZ()));
+		for(int i = 0; i < bombCount; i++){
+		Optional<Entity> entity = playerWorld.createEntity(EntityTypes.PRIMED_TNT, new Vector3d(entityLocation.getX(),entityLocation.getY(),entityLocation.getZ()));
 		if(entity.isPresent()){
-			Fireball tnt = (Fireball) entity.get();
+			PrimedTNT tnt = (PrimedTNT) entity.get();
+			//FuseData fuse = tnt.getFuseData();
+			//fuse.setFuseDuration(40);
+			//tnt.offer(fuse);
 			playerWorld.spawnEntity(tnt);
 			
 		}
+		}
+		cS.sendMessage(Texts.of("KaBewhm! " + passed + " tnt spawned."));
+		}else{
+			cS.sendMessage(Texts.of("Party is disabled. Enable it in /config/Spongy/config.conf. Please note that /party is a sloppy plugin that was made for fun and isn't very well implemented."));
 		}
 		return Optional.of(CommandResult.empty());
 	}

@@ -69,7 +69,7 @@ public class Me implements CommandCallable {
 				if(nickname.equals("null")){
 					nickname = cS.getName();
 				}
-				game.getServer().broadcastMessage(Texts.of(Texts.replaceCodes("&5* " + nickname + "&r&5 " + passed, '&')));
+				game.getServer().broadcastMessage(Texts.of(Texts.fromLegacy("&5* " + nickname + "&5 " + passed, '&')));
 			}
 			userConfig.save(config);
 		} catch (IOException e) {

@@ -10,8 +10,10 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.data.manipulators.DisplayNameData;
 //import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 import org.spongepowered.api.event.message.MessageEvent;
@@ -77,7 +79,7 @@ public class Main {
 	public void PreInitialization(PreInitializationEvent event) {
 		try {
 			mainConfig = this.getLoader("config.conf");
-			userConfig = this.getLoader("users.conf");
+			userConfig = this.getLoader("userdata.conf");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -89,6 +91,9 @@ public class Main {
 			config.getNode("version").setValue(plugin.version());
 			if(config.getNode("playJoinSound").isVirtual()){
 				config.getNode("playJoinSound").setValue(false);
+			}
+			if(config.getNode("enableParty").isVirtual()){
+				config.getNode("enableParty").setValue(false);
 			}
 			useJoinSound = config.getNode("playJoinSound").getBoolean();
 			mainConfig.save(config);
@@ -127,7 +132,7 @@ public class Main {
 				"nick");
 		cmdService.register(this, new Me(logger, game, userConfig),
 				"me");
-		cmdService.register(this, new Party(logger, game, userConfig),
+		cmdService.register(this, new Party(logger, game, mainConfig),
 				"party");
 	}
 
@@ -176,35 +181,43 @@ public class Main {
 	}
 
 	@SuppressWarnings("deprecation")
-	@Subscribe
+	@Subscribe(order = Order.LAST)
 	public void onMessage(MessageEvent event) {
 		// Replace all colorcodes with actual ones
-		String original = Texts.toPlain(event.getMessage());
+		String original = Texts.toLegacy(event.getMessage(),'&');
 		ConfigurationNode thisConfig = null;
 		try {
 			thisConfig = userConfig.load();
 		} catch (IOException e) {
 			logger.error("Failed to load userConfig");
 		}
-		logger.info(event.getSource().getIdentifier());
+		boolean shouldFormat = true;
+		if(game.getPluginManager().getPlugin("EC").isPresent()){
+			shouldFormat = false;
+		}
 		try{
 			//temporary nickname implementation
 			//sloppy as crap.
 			//also need a config entry on how people want this to be formatted.
 			String username = thisConfig.getNode(event.getSource().getIdentifier(),"nickname").getString();
-			if(username.equals("null")){
-				username = event.getSource().getName();
-			}
-			String edited = original.replace("<" + event.getSource().getName() + ">",username + "&r:");
-			original = edited;
+			DisplayNameData dND = game.getServer().getPlayer(event.getSource().getName()).get().getData(DisplayNameData.class).get();
+			dND.setDisplayName(Texts.of(username));
+			dND.setCustomNameVisible(true);
+			game.getServer().getPlayer(event.getSource().getName()).get().offer(dND);
+			//if(username.equals("null")){
+			//	username = event.getSource().getName();
+			//}
+			//String edited = original.replace("<" + event.getSource().getName() + ">",event.getSource().getName() + "&f:");
+			String edited = original.replace(event.getSource().getName(), username);
+			original = edited;	
 		}catch(NullPointerException e){
-			logger.error("Failed to replace nickname");
 		}
 		try {
 			userConfig.save(thisConfig);
 		} catch (IOException e) {
 		}
 		// TODO: Replace with a better method of parsing.
-		event.setMessage(Texts.of(Texts.replaceCodes(original, '&')));
+		logger.info("In /config/Spongy/config.conf, please change \"imcom");
+		event.setMessage(Texts.of(Texts.fromLegacy(original, '&')));
 	}
 }

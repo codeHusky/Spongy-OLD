@@ -195,10 +195,6 @@ public class Main {
 		} catch (IOException e) {
 			logger.error("Failed to load userConfig");
 		}
-		boolean shouldFormat = true;
-		if(game.getPluginManager().getPlugin("EC").isPresent()){
-			shouldFormat = false;
-		}
 		try{
 			//temporary nickname implementation
 			//sloppy as crap.
@@ -212,8 +208,8 @@ public class Main {
 			userConfig.save(thisConfig);
 		} catch (IOException e) {
 		}
-		// TODO: Replace with a better method of parsing.
-		logger.info("In /config/Spongy/config.conf, please change \"imcom");
+		original = "&r"  + original;
+		//logger.info("In /config/Spongy/config.conf, please change \"imcom");
 		event.setMessage(Texts.of(Texts.fromLegacy(original, '&')));
 	}
 	

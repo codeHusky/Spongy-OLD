@@ -10,12 +10,15 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.tile.Sign;
 import org.spongepowered.api.data.manipulators.DisplayNameData;
 import org.spongepowered.api.data.manipulators.tileentities.SignData;
 //import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.block.BlockPlaceEvent;
 import org.spongepowered.api.event.block.tile.SignChangeEvent;
 import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 import org.spongepowered.api.event.message.MessageEvent;
@@ -213,9 +216,10 @@ public class Main {
 		event.setMessage(Texts.of(Texts.fromLegacy(original, '&')));
 	}
 	
-	@SuppressWarnings("deprecation")
+	/*@SuppressWarnings("deprecation")
 	@Subscribe
 	public void onSignEdit(SignChangeEvent event){
+		logger.info("Sign Edited!");
 		//le epic sause.
 		SignData BlockLoco = event.getSign().getSignData();
 		String line0 = BlockLoco.getLine(0).toString();
@@ -228,4 +232,9 @@ public class Main {
 		BlockLoco.setLine(0, Texts.fromLegacy(line3,'&'));
 		event.getSign().offer(BlockLoco);
 	}
+	@SuppressWarnings("deprecation")
+	@Subscribe
+	public void onBlockPlace(BlockPlaceEvent event){
+		event.setCancelled(true);
+	}*/
 }

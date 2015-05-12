@@ -15,7 +15,11 @@ import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.world.Location;
 
+import com.terminalbit.spongy.util.GeneralUtils;
+
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 
 public class simpleTP implements CommandCallable {
@@ -58,7 +62,7 @@ public class simpleTP implements CommandCallable {
 	public Optional<CommandResult> process(CommandSource cS, String passed){
 		Server server = game.getServer();
 		Player caller = server.getPlayer(cS.getName()).get();
-		Player destination = null;
+		Location destination = null;
 		if(passed.length() < 1){
 			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Format: /tp <username>"));
 		}else if(!server.getPlayer(passed).isPresent()){
@@ -66,8 +70,10 @@ public class simpleTP implements CommandCallable {
 		}else{
 			logger.info(cS.getName() + " teleported to " + passed);
 			//destination.getWorld().getBlock(destination.getLocation().getBlock());
-			destination = server.getPlayer(passed).get();
-			caller.setLocation(destination.getLocation());
+			destination = server.getPlayer(passed).get().getLocation();
+			Vector3d desRot = server.getPlayer(passed).get().getRotation();
+			//caller.setLocation(destination.getLocation());
+			GeneralUtils.TeleAndRotate(caller,destination,desRot);
 		}	
 		return Optional.of(CommandResult.empty());
 	}

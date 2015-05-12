@@ -16,6 +16,7 @@ import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
 
 import com.google.common.base.Optional;
+import com.terminalbit.spongy.util.GeneralUtils;
 
 public class simpleTPHERE implements CommandCallable {
 	private Logger logger;
@@ -65,7 +66,8 @@ public class simpleTPHERE implements CommandCallable {
 		}else{
 			logger.info(cS.getName() + " brought " + passed + " to themself.");
 			destination = server.getPlayer(passed).get();
-			destination.setLocation(caller.getLocation());
+			GeneralUtils.TeleAndRotate(destination,caller.getLocation(),caller.getRotation());
+			//destination.setLocation(caller.getLocation());
 		}		
 		return Optional.of(CommandResult.empty());
 	}

@@ -22,6 +22,7 @@ import org.spongepowered.api.world.Location;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
+import com.terminalbit.spongy.util.GeneralUtils;
 
 public class Warp implements CommandCallable {
 	private Logger logger;
@@ -114,8 +115,7 @@ public class Warp implements CommandCallable {
 					config.getNode("warps",passed,"rotation","z").getFloat()
 			);
 			Player caller = game.getServer().getPlayer(cS.getName()).get();
-			caller.setLocationAndRotation(destinationPos, destinationRot);
-			//caller.setLocationSafely(destinationPos);
+			GeneralUtils.TeleAndRotate(caller,destinationPos,destinationRot);
 			logger.info(cS.getName() + " warped to " + passed);
 			cS.sendMessage(Texts.of(TextColors.GOLD,"Success: ", TextColors.YELLOW, "Sending you to \"" + passed + "\"."));
 		} else {

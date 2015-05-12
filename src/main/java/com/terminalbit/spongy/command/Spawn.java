@@ -20,7 +20,9 @@ import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
+import com.terminalbit.spongy.util.GeneralUtils;
 
 public class Spawn implements CommandCallable {
 	private Logger logger;
@@ -76,7 +78,13 @@ public class Spawn implements CommandCallable {
 			double z = config.getNode("spawn","position","Z").getFloat();
 			Location spawn = new Location(playerWorld,x,y,z);
 			cS.sendMessage(Texts.of(TextColors.GOLD,"Success: ",TextColors.YELLOW,"Sending you to the spawn."));
-			game.getServer().getPlayer(cS.getName()).get().setLocation(spawn);
+			//game.getServer().getPlayer(cS.getName()).get().setLocation(spawn);
+			Vector3d desRot = new Vector3d(
+					config.getNode("spawn","rotation","X").getFloat(),
+					config.getNode("spawn","rotation","Y").getFloat(),
+					config.getNode("spawn","rotation","Z").getFloat()
+					);
+			GeneralUtils.TeleAndRotate(game.getServer().getPlayer(cS.getName()).get(),spawn,desRot);
 			configManager.save(config);
 		}catch(IOException e){
 			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ",TextColors.RED, "An error occured."));

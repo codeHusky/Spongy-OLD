@@ -19,6 +19,7 @@ import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.world.Location;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 
 public class setSpawn implements CommandCallable {
@@ -65,9 +66,13 @@ public class setSpawn implements CommandCallable {
 		try{
 			config = configManager.load();
 			Location playerLocation = game.getServer().getPlayer(cS.getName()).get().getLocation();
+			Vector3d playerRot = game.getServer().getPlayer(cS.getName()).get().getRotation();
 			config.getNode("spawn","position","X").setValue(playerLocation.getX());
 			config.getNode("spawn","position","Y").setValue(playerLocation.getY());
 			config.getNode("spawn","position","Z").setValue(playerLocation.getZ());
+			config.getNode("spawn","rotation","X").setValue(playerRot.getX());
+			config.getNode("spawn","rotation","Y").setValue(playerRot.getY());
+			config.getNode("spawn","rotation","Z").setValue(playerRot.getZ());
 			configManager.save(config);
 			cS.sendMessage(Texts.of(TextColors.GOLD,"Success: ",TextColors.YELLOW,"The spawn was set."));
 		}catch(IOException e){

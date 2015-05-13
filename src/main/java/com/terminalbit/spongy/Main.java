@@ -49,7 +49,7 @@ import com.terminalbit.spongy.command.setWarp;
 import com.terminalbit.spongy.command.simpleTP;
 import com.terminalbit.spongy.command.simpleTPHERE;
 
-@Plugin(id = "Spongy", name = "Spongy", version = "0.3")
+@Plugin(id = "Spongy", name = "Spongy", version = "0.4")
 public class Main {
 	@Inject
 	public Logger logger;

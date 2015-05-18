@@ -10,16 +10,10 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.block.tile.Sign;
-import org.spongepowered.api.data.manipulators.DisplayNameData;
-import org.spongepowered.api.data.manipulators.tileentities.SignData;
 //import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.block.BlockPlaceEvent;
-import org.spongepowered.api.event.block.tile.SignChangeEvent;
 import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.state.InitializationEvent;
@@ -28,13 +22,12 @@ import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.command.CommandService;
 import org.spongepowered.api.service.config.ConfigDir;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import com.google.inject.Inject;
 import com.terminalbit.spongy.command.Broadcast;
 import com.terminalbit.spongy.command.Me;
@@ -122,7 +115,14 @@ public class Main {
 				.setExecutor(new Broadcast()).build();
 		cmdService.register(this, broadcastSpec, "broadcast");
 		cmdService.register(this, new actAsConsole(logger, game), "asconsole");
-		cmdService.register(this, new simpleTP(logger, game), "tp");
+		Text usss = Texts.of("username");
+		CommandSpec tpSpec = CommandSpec
+				.builder()
+				.setDescription(Texts.of("Tp Desc"))
+				// .setPermission("spongy.teleport.tp") <-- Let's not... :)
+				.setArguments(player(usss,game))
+				.setExecutor(new simpleTP()).build();
+		cmdService.register(this, tpSpec, "tp");
 		cmdService.register(this, new simpleTPHERE(logger, game), "tphere");
 		cmdService.register(this, new setWarp(logger, game, mainConfig),
 				"setwarp");

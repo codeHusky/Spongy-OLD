@@ -109,19 +109,19 @@ public class Main {
 		CommandService cmdService = game.getCommandDispatcher();
 		CommandSpec broadcastSpec = CommandSpec
 				.builder()
-				.setDescription(Texts.of("Broadcast Desc"))
+				.description(Texts.of("Broadcast Desc"))
 				// .setPermission("spongy.chat.broadcast") <-- Let's not... :)
-				.setArguments(optional(remainingJoinedStrings(Texts.of("all"))))
-				.setExecutor(new Broadcast()).build();
+				.arguments(optional(remainingJoinedStrings(Texts.of("all"))))
+				.executor(new Broadcast()).build();
 		cmdService.register(this, broadcastSpec, "broadcast");
 		cmdService.register(this, new actAsConsole(logger, game), "asconsole");
 		Text usss = Texts.of("username");
 		CommandSpec tpSpec = CommandSpec
 				.builder()
-				.setDescription(Texts.of("Tp Desc"))
+				.description(Texts.of("Tp Desc"))
 				// .setPermission("spongy.teleport.tp") <-- Let's not... :)
-				.setArguments(player(usss,game))
-				.setExecutor(new simpleTP()).build();
+				.arguments(player(usss,game))
+				.executor(new simpleTP()).build();
 		cmdService.register(this, tpSpec, "tp");
 		cmdService.register(this, new simpleTPHERE(logger, game), "tphere");
 		cmdService.register(this, new setWarp(logger, game, mainConfig),
@@ -213,7 +213,7 @@ public class Main {
 		}
 		original = "&r"  + original;
 		//logger.info("In /config/Spongy/config.conf, please change \"imcom");
-		event.setMessage(Texts.of(Texts.fromLegacy(original, '&')));
+		event.setNewMessage(Texts.of(Texts.fromLegacy(original, '&')));
 	}
 	
 	/*@SuppressWarnings("deprecation")

@@ -25,7 +25,7 @@ public class simpleTP implements CommandExecutor {
 	public CommandResult execute(CommandSource cS, CommandContext args){
 		Server server = game.getServer();
 		Player caller = server.getPlayer(cS.getName()).get();
-		Player passedSTEP = (Player) args.getOne("username").get();
+		Player passedSTEP = (Player) args.getOne("Player").get();
 		String passed = passedSTEP.getName();
 		Location destination = null;
 		if(passed.length() < 1){

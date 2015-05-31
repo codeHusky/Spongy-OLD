@@ -14,15 +14,14 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.player.PlayerChatEvent;
 import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
-import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.state.InitializationEvent;
 import org.spongepowered.api.event.state.PreInitializationEvent;
 import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.command.CommandService;
 import org.spongepowered.api.service.config.ConfigDir;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
@@ -41,6 +40,7 @@ import com.terminalbit.spongy.command.setSpawn;
 import com.terminalbit.spongy.command.setWarp;
 import com.terminalbit.spongy.command.simpleTP;
 import com.terminalbit.spongy.command.simpleTPHERE;
+import com.terminalbit.spongy.util.Permissions;
 
 @Plugin(id = "Spongy", name = "Spongy", version = "0.4")
 public class Main {
@@ -77,6 +77,7 @@ public class Main {
 	
 	@Subscribe
 	public void PreInitialization(PreInitializationEvent event) {
+		Permissions.registerDefaultPermissions(this.game);
 		try {
 			mainConfig = this.getLoader("config.conf");
 			userConfig = this.getLoader("userdata.conf");
@@ -109,38 +110,79 @@ public class Main {
 		CommandService cmdService = game.getCommandDispatcher();
 		CommandSpec broadcastSpec = CommandSpec
 				.builder()
-				.setDescription(Texts.of("Broadcast Desc"))
-				// .setPermission("spongy.chat.broadcast") <-- Let's not... :)
-				.setArguments(optional(remainingJoinedStrings(Texts.of("all"))))
-				.setExecutor(new Broadcast()).build();
-		cmdService.register(this, broadcastSpec, "broadcast");
-		cmdService.register(this, new actAsConsole(logger, game), "asconsole");
-		Text usss = Texts.of("username");
+				.arguments(optional(remainingJoinedStrings(Texts.of("all"))))
+				.permission("spongy.chat.broadcast")
+				.executor(new Broadcast()).build();
 		CommandSpec tpSpec = CommandSpec
 				.builder()
-				.setDescription(Texts.of("Tp Desc"))
-				// .setPermission("spongy.teleport.tp") <-- Let's not... :)
-				.setArguments(player(usss,game))
-				.setExecutor(new simpleTP()).build();
+				.arguments(player(Texts.of("Player"),game))
+				.permission("spongy.admin.tp")
+				.executor(new simpleTP()).build();
+		CommandSpec tphereSpec = CommandSpec
+				.builder()
+				.arguments(player(Texts.of("Player"),game))
+				.permission("spongy.admin.tphere")
+				.executor(new simpleTPHERE()).build();
+		CommandSpec setwarp = CommandSpec
+				.builder()
+				.arguments(remainingJoinedStrings(Texts.of("Warp Name")))
+				.permission("spongy.admin.setwarp")
+				.executor(new setWarp()).build();
+		CommandSpec setspawn = CommandSpec
+				.builder()
+				.arguments()
+				.permission("spongy.admin.setspawn")
+				.executor(new setSpawn()).build();
+		CommandSpec nick = CommandSpec
+				.builder()
+				.arguments(remainingJoinedStrings(Texts.of("Nickname")))
+				.permission("spongy.chat.nick")
+				.executor(new Nick()).build();
+		CommandSpec me = CommandSpec
+				.builder()
+				.arguments(remainingJoinedStrings(Texts.of("Action")))
+				.permission("spongy.chat.me")
+				.executor(new Me()).build();
+		CommandSpec party = CommandSpec
+				.builder()
+				.arguments(string(Texts.of("Amount")))
+				.permission("spongy.fun.party")
+				.executor(new Party()).build();
+		CommandSpec asconsole = CommandSpec
+				.builder()
+				.arguments(remainingJoinedStrings(Texts.of("command")))
+				.permission("spongy.admin.asconsole")
+				.executor(new actAsConsole()).build();
+		CommandSpec warp = CommandSpec
+				.builder()
+				.arguments(optional(remainingJoinedStrings(Texts.of("Warp Name"))))
+				.permission("spongy.tele.warp")
+				.executor(new Warp())
+				.build();
+		CommandSpec spawn = CommandSpec
+				.builder()
+				.arguments()
+				.permission("spongy.tele.spawn")
+				.executor(new Spawn())
+				.build();
+		/*
+		 * defaultData.setPermission(SubjectData.GLOBAL_CONTEXT, "spongy.tp.spawn", Tristate.TRUE);
+           defaultData.setPermission(SubjectData.GLOBAL_CONTEXT, "spongy.tp.warp", Tristate.TRUE);
+           defaultData.setPermission(SubjectData.GLOBAL_CONTEXT, "spongy.chat.nick", Tristate.TRUE);
+           defaultData.setPermission(SubjectData.GLOBAL_CONTEXT, "spongy.chat.me", Tristate.TRUE);
+		 */
+		cmdService.register(this, broadcastSpec, "broadcast");
 		cmdService.register(this, tpSpec, "tp");
-		cmdService.register(this, new simpleTPHERE(logger, game), "tphere");
-		cmdService.register(this, new setWarp(logger, game, mainConfig),
-				"setwarp");
-		cmdService
-				.register(this, new Warp(logger, game, mainConfig), "warp");
-		cmdService.register(this,
-				new reloadConfig(logger, game, mainConfig),
-				"reloadSpongyConfig");
-		cmdService.register(this, new Spawn(logger, game, mainConfig),
-				"spawn");
-		cmdService.register(this, new setSpawn(logger, game, mainConfig),
-				"setspawn");
-		cmdService.register(this, new Nick(logger, game, userConfig),
-				"nick");
-		cmdService.register(this, new Me(logger, game, userConfig),
-				"me");
-		cmdService.register(this, new Party(logger, game, mainConfig),
-				"party");
+		cmdService.register(this, asconsole, "asconsole");
+		cmdService.register(this, tphereSpec, "tphere");
+		cmdService.register(this, setwarp,"setwarp");
+		cmdService.register(this, warp, "warp");
+		//cmdService.register(this, new reloadConfig(logger, game, mainConfig),"reloadSpongyConfig");
+		cmdService.register(this, spawn,"spawn");
+		cmdService.register(this, setspawn,"setspawn");
+		cmdService.register(this, nick,"nick");
+		cmdService.register(this, me,"me");
+		cmdService.register(this, party,"party");
 	}
 
 	@Subscribe
@@ -189,9 +231,9 @@ public class Main {
 
 	@SuppressWarnings("deprecation")
 	@Subscribe(order = Order.LAST)
-	public void onMessage(MessageEvent event) {
+	public void onMessage(PlayerChatEvent event) {
 		// Replace all colorcodes with actual ones
-		String original = Texts.toLegacy(event.getMessage(),'&');
+		String original = Texts.toLegacy(event.getNewMessage(),'&');
 		ConfigurationNode thisConfig = null;
 		try {
 			thisConfig = userConfig.load();
@@ -213,7 +255,8 @@ public class Main {
 		}
 		original = "&r"  + original;
 		//logger.info("In /config/Spongy/config.conf, please change \"imcom");
-		event.setMessage(Texts.of(Texts.fromLegacy(original, '&')));
+		//event.setMessage(Texts.of(Texts.fromLegacy(original, '&')));
+		event.setNewMessage(Texts.of(Texts.fromLegacy(original, '&')));
 	}
 	
 	/*@SuppressWarnings("deprecation")

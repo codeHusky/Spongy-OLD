@@ -20,13 +20,16 @@ import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.util.command.args.CommandContext;
+import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
+import com.terminalbit.spongy.Main;
 
-public class Party implements CommandCallable {
+public class Party implements CommandExecutor {
 	private Logger logger;
 	private Game game;
 	private Text hT = Texts.of("Help Text");
@@ -37,40 +40,18 @@ public class Party implements CommandCallable {
 	private ConfigurationLoader<CommentedConfigurationNode> configManager;
 	private ConfigurationNode config;
 	
-    public Party(Logger logger, Game game, ConfigurationLoader<CommentedConfigurationNode> userConfig) {
+    public Party() {
     	//Gets the, you know, stuff from the main class.
-    	this.logger = logger;
-    	this.game = game;
-    	this.configManager = userConfig;
+    	this.logger = Main.access.logger;
+    	this.game = Main.access.game;
+    	this.configManager = Main.access.mainConfig;
     	try {
 			config = configManager.load();
 		} catch (IOException e) {}
     }
-
-    public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
-        return Collections.emptyList();
-    }
-
-	public Optional<Text> getHelp(CommandSource arg0) {
-		//Not sure what this is ;)
-		logger.info("getHelp");
-		return help;
-	}
-
-	public Optional<Text> getShortDescription(CommandSource arg0) {
-		//This too. :)
-		logger.info("getShortDescription");
-		return desc;
-	}
-
-	public Text getUsage(CommandSource arg0) {
-		//This is probably for the help. :P
-		logger.info("getUsage");
-		return usage;
-	}
-
-	public Optional<CommandResult> process(CommandSource cS, String passed){
-		//do stuff here when command is fired
+	public CommandResult execute(CommandSource cS, CommandContext args)
+			throws CommandException {
+		String passed = args.getOne("Amount").get().toString();
 		try {
 			config = configManager.load();
 		} catch (IOException e) {}
@@ -97,12 +78,6 @@ public class Party implements CommandCallable {
 		}else{
 			cS.sendMessage(Texts.of("Party is disabled. Enable it in /config/Spongy/config.conf. Please note that /party is a sloppy plugin that was made for fun and isn't very well implemented."));
 		}
-		return Optional.of(CommandResult.empty());
-	}
-
-	public boolean testPermission(CommandSource arg0) {
-		logger.info("testPermission");
-		//I guess if it needs, then return true.
-		return true;
+		return CommandResult.empty();
 	}
 }

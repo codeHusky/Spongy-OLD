@@ -17,14 +17,17 @@ import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.util.command.args.CommandContext;
+import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
+import com.terminalbit.spongy.Main;
 import com.terminalbit.spongy.util.GeneralUtils;
 
-public class Spawn implements CommandCallable {
+public class Spawn implements CommandExecutor {
 	private Logger logger;
 	private Game game;
 	private Text hT = Texts.of("Help Text");
@@ -35,43 +38,22 @@ public class Spawn implements CommandCallable {
 	private ConfigurationLoader<CommentedConfigurationNode> configManager;
 	private ConfigurationNode config = null;
 	
-    public Spawn(Logger logger, Game game, ConfigurationLoader<CommentedConfigurationNode> configManager) {
+    public Spawn() {
     	//Gets the, you know, stuff from the main class.
-    	this.logger = logger;
-    	this.game = game;
-    	this.configManager = configManager;
+    	this.logger = Main.access.logger;
+    	this.game = Main.access.game;
+    	this.configManager = Main.access.mainConfig;
     }
 
-    public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
-        return Collections.emptyList();
-    }
-
-	public Optional<Text> getHelp(CommandSource arg0) {
-		//Not sure what this is ;)
-		logger.info("getHelp");
-		return help;
-	}
-
-	public Optional<Text> getShortDescription(CommandSource arg0) {
-		//This too. :)
-		logger.info("getShortDescription");
-		return desc;
-	}
-
-	public Text getUsage(CommandSource arg0) {
-		//This is probably for the help. :P
-		logger.info("getUsage");
-		return usage;
-	}
-
-	public Optional<CommandResult> process(CommandSource cS, String passed){
+	public CommandResult execute(CommandSource cS, CommandContext args)
+			throws CommandException {
 		try{
 			World playerWorld = game.getServer().getPlayer(cS.getName()).get().getWorld();
 			config = configManager.load();
 			if(config.getNode("spawn").isVirtual()){
 				cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ",TextColors.RED, "There is no spawn set. Please ask a server administrator to set one."));
 				configManager.save(config);
-				return Optional.of(CommandResult.empty());
+				return CommandResult.empty();
 			}
 			double x = config.getNode("spawn","position","X").getFloat();
 			double y = config.getNode("spawn","position","Y").getFloat();
@@ -89,12 +71,6 @@ public class Spawn implements CommandCallable {
 		}catch(IOException e){
 			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ",TextColors.RED, "An error occured."));
 		}
-		return Optional.of(CommandResult.empty());
-	}
-
-	public boolean testPermission(CommandSource arg0) {
-		logger.info("testPermission");
-		//I guess if it needs, then return true.
-		return true;
+		return CommandResult.empty();
 	}
 }

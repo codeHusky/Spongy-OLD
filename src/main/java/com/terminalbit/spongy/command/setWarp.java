@@ -17,12 +17,15 @@ import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.util.command.args.CommandContext;
+import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.world.Location;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
+import com.terminalbit.spongy.Main;
 
-public class setWarp implements CommandCallable {
+public class setWarp implements CommandExecutor {
 	private Logger logger;
 	private Game game;
 	private Text hT = Texts.of("Help Text");
@@ -33,37 +36,16 @@ public class setWarp implements CommandCallable {
 	private ConfigurationLoader<CommentedConfigurationNode> configManager;
 	private ConfigurationNode config = null;
 	
-    public setWarp(Logger logger, Game game, ConfigurationLoader<CommentedConfigurationNode> configManager) {
+    public setWarp() {
     	//Gets the, you know, stuff from the main class.
-    	this.logger = logger;
-    	this.game = game;
-    	this.configManager = configManager;
+    	this.logger = Main.access.logger;
+    	this.game = Main.access.game;
+    	this.configManager = Main.access.mainConfig;
     }
-
-    public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
-        return Collections.emptyList();
-    }
-
-	public Optional<Text> getHelp(CommandSource arg0) {
-		//Not sure what this is ;)
-		logger.info("getHelp");
-		return help;
-	}
-
-	public Optional<Text> getShortDescription(CommandSource arg0) {
-		//This too. :)
-		logger.info("getShortDescription");
-		return desc;
-	}
-
-	public Text getUsage(CommandSource arg0) {
-		//This is probably for the help. :P
-		logger.info("getUsage");
-		return usage;
-	}
-
-	public Optional<CommandResult> process(CommandSource cS, String passed){
-    	try {
+	public CommandResult execute(CommandSource cS, CommandContext args)
+			throws CommandException {
+		String passed = args.getOne("Warp Name").get().toString();
+		try {
 			config = configManager.load();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -72,7 +54,7 @@ public class setWarp implements CommandCallable {
 		try{
 		if(Integer.toString(Integer.parseInt(passed)).equals(passed)){
 			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Your warp cannot be just a number."));
-			return Optional.of(CommandResult.empty());
+			return CommandResult.empty();
 		}
 		}catch(NumberFormatException e){}
 		if(passed.contains(" ")){
@@ -95,12 +77,6 @@ public class setWarp implements CommandCallable {
 		} else {
 			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ", TextColors.RED, "Format: /setwarp <warpname>"));
 		}
-		return Optional.of(CommandResult.empty());
-	}
-
-	public boolean testPermission(CommandSource arg0) {
-		logger.info("testPermission");
-		//I guess if it needs, then return true.
-		return true;
+		return CommandResult.empty();
 	}
 }

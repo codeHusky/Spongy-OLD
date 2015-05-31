@@ -12,10 +12,13 @@ import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.util.command.args.CommandContext;
+import org.spongepowered.api.util.command.spec.CommandExecutor;
 
 import com.google.common.base.Optional;
+import com.terminalbit.spongy.Main;
 
-public class actAsConsole implements CommandCallable {
+public class actAsConsole implements CommandExecutor {
 	private Logger logger;
 	private Game game;
 	private Text hT = Texts.of("Help Text");
@@ -24,42 +27,17 @@ public class actAsConsole implements CommandCallable {
 	private Optional<Text> help = Optional.of(hT);
 	private Optional<Text> desc = Optional.of(dT);
 	
-    public actAsConsole(Logger logger, Game game) {
+    public actAsConsole() {
     	//Gets the, you know, stuff from the main class.
-    	this.logger = logger;
-    	this.game = game;
+    	this.logger = Main.access.logger;
+    	this.game = Main.access.game;
     }
 
-    public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
-        return Collections.emptyList();
-    }
-
-	public Optional<Text> getHelp(CommandSource arg0) {
-		//Not sure what this is ;)
-		logger.info("getHelp");
-		return help;
-	}
-
-	public Optional<Text> getShortDescription(CommandSource arg0) {
-		//This too. :)
-		logger.info("getShortDescription");
-		return desc;
-	}
-
-	public Text getUsage(CommandSource arg0) {
-		//This is probably for the help. :P
-		logger.info("getUsage");
-		return usage;
-	}
-
-	public Optional<CommandResult> process(CommandSource cS, String passed){
+	public CommandResult execute(CommandSource cS, CommandContext args) throws CommandException {
+		String passed = args.getOne("command").get().toString();
 		logger.info(cS.getName() + " called " + passed + " as the console.");
 		cS.sendMessage(Texts.of(TextColors.GOLD,"Success: ", TextColors.YELLOW, "You called \"" + passed + "\" as the console."));
 		game.getCommandDispatcher().process(game.getServer().getConsole(), passed);
-		return Optional.of(CommandResult.empty());
-	}
-
-	public boolean testPermission(CommandSource cS) {
-		return cS.hasPermission("Spongy.actAsConsole");
+		return CommandResult.empty();
 	}
 }

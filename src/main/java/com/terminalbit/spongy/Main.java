@@ -136,12 +136,12 @@ public class Main {
 		CommandSpec nick = CommandSpec
 				.builder()
 				.arguments(remainingJoinedStrings(Texts.of("Nickname")))
-				.permission("spongy.chat.nick")
+				//.permission("spongy.chat.nick")
 				.executor(new Nick()).build();
 		CommandSpec me = CommandSpec
 				.builder()
 				.arguments(remainingJoinedStrings(Texts.of("Action")))
-				.permission("spongy.chat.me")
+				//.permission("spongy.chat.me")
 				.executor(new Me()).build();
 		CommandSpec party = CommandSpec
 				.builder()
@@ -156,13 +156,13 @@ public class Main {
 		CommandSpec warp = CommandSpec
 				.builder()
 				.arguments(optional(remainingJoinedStrings(Texts.of("Warp Name"))))
-				.permission("spongy.tele.warp")
+				//.permission("spongy.tele.warp")
 				.executor(new Warp())
 				.build();
 		CommandSpec spawn = CommandSpec
 				.builder()
 				.arguments()
-				.permission("spongy.tele.spawn")
+				//.permission("spongy.tele.spawn")
 				.executor(new Spawn())
 				.build();
 		/*

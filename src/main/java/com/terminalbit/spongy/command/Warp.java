@@ -35,14 +35,12 @@ public class Warp implements CommandExecutor {
 	private Text usage = Texts.of("Usage!! :D");
 	private Optional<Text> help = Optional.of(hT);
 	private Optional<Text> desc = Optional.of(dT);
-	private ConfigurationLoader<CommentedConfigurationNode> configManager;
 	private ConfigurationNode config = null;
 	
 	public Warp() {
     	//Gets the, you know, stuff from the main class.
     	this.logger = Main.access.logger;
     	this.game = Main.access.game;
-    	this.configManager = Main.access.mainConfig;
     }
 
 	public CommandResult execute(CommandSource cS, CommandContext args)
@@ -51,11 +49,7 @@ public class Warp implements CommandExecutor {
 		if(args.getOne("Warp Name").isPresent()){
 			passed = args.getOne("Warp Name").get().toString();
 		}
-		try {
-			config = configManager.load();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		config = Main.access.mConCache;
 		passed = passed.toLowerCase();
 		try{
 		if(Integer.toString(Integer.parseInt(passed)).equals(passed)){

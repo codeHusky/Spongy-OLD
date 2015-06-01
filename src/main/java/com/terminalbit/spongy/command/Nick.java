@@ -37,15 +37,14 @@ public class Nick implements CommandExecutor {
     	//Gets the, you know, stuff from the main class.
     	this.logger = Main.access.logger;
     	//this.game = game;
-    	this.userConfig = Main.access.mainConfig;
+    	this.userConfig = Main.access.userConfig;
     }
 
 	@SuppressWarnings("deprecation")
 	public CommandResult execute(CommandSource cS, CommandContext args)
 			throws CommandException {
 		String passed = args.getOne("Nickname").get().toString();
-		try {
-			config = userConfig.load();
+			config = Main.access.uConCache;
 			if(passed.length() == 0){
 				config.getNode(cS.getIdentifier(),"nickname").setValue("null");
 				cS.sendMessage(Texts.of("Your nickname was reset"));
@@ -55,9 +54,11 @@ public class Nick implements CommandExecutor {
 				config.getNode(cS.getIdentifier(),"nickname").setValue(passed);
 				cS.sendMessage(Texts.of(Texts.replaceCodes("Your nick was set to \"" + passed + "&r\"",'&')));
 			}
-			userConfig.save(config);
-		} catch (IOException e) {
-		}
+			try {
+				userConfig.save(config);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		
 		return CommandResult.empty();
 	}

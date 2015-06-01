@@ -45,7 +45,7 @@ public class setSpawn implements CommandExecutor {
 	public CommandResult execute(CommandSource cS, CommandContext args)
 			throws CommandException {
 		try{
-			config = configManager.load();
+			config = Main.access.mConCache;
 			Location playerLocation = game.getServer().getPlayer(cS.getName()).get().getLocation();
 			Vector3d playerRot = game.getServer().getPlayer(cS.getName()).get().getRotation();
 			config.getNode("spawn","position","X").setValue(playerLocation.getX());

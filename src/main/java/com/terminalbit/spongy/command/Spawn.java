@@ -35,24 +35,20 @@ public class Spawn implements CommandExecutor {
 	private Text usage = Texts.of("Usage!! :D");
 	private Optional<Text> help = Optional.of(hT);
 	private Optional<Text> desc = Optional.of(dT);
-	private ConfigurationLoader<CommentedConfigurationNode> configManager;
 	private ConfigurationNode config = null;
 	
     public Spawn() {
     	//Gets the, you know, stuff from the main class.
     	this.logger = Main.access.logger;
     	this.game = Main.access.game;
-    	this.configManager = Main.access.mainConfig;
     }
 
 	public CommandResult execute(CommandSource cS, CommandContext args)
-			throws CommandException {
-		try{
+	throws CommandException {
 			World playerWorld = game.getServer().getPlayer(cS.getName()).get().getWorld();
-			config = configManager.load();
+			config = Main.access.mConCache;
 			if(config.getNode("spawn").isVirtual()){
 				cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ",TextColors.RED, "There is no spawn set. Please ask a server administrator to set one."));
-				configManager.save(config);
 				return CommandResult.empty();
 			}
 			double x = config.getNode("spawn","position","X").getFloat();
@@ -67,10 +63,6 @@ public class Spawn implements CommandExecutor {
 					config.getNode("spawn","rotation","Z").getFloat()
 					);
 			GeneralUtils.TeleAndRotate(game.getServer().getPlayer(cS.getName()).get(),spawn,desRot);
-			configManager.save(config);
-		}catch(IOException e){
-			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ",TextColors.RED, "An error occured."));
-		}
 		return CommandResult.empty();
 	}
 }

@@ -45,16 +45,11 @@ public class Party implements CommandExecutor {
     	this.logger = Main.access.logger;
     	this.game = Main.access.game;
     	this.configManager = Main.access.mainConfig;
-    	try {
-			config = configManager.load();
-		} catch (IOException e) {}
     }
 	public CommandResult execute(CommandSource cS, CommandContext args)
 			throws CommandException {
 		String passed = args.getOne("Amount").get().toString();
-		try {
-			config = configManager.load();
-		} catch (IOException e) {}
+		config = Main.access.mConCache;
 		if(config.getNode("enableParty").getBoolean()){
 		int bombCount = 10;
 		if(Integer.toString(Integer.parseInt(passed)).equals(passed)){

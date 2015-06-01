@@ -2,6 +2,10 @@ package com.terminalbit.spongy;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -23,19 +27,22 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.command.CommandService;
 import org.spongepowered.api.service.config.ConfigDir;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.util.command.CommandCallable;
+import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
 import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
 import com.google.inject.Inject;
 import com.terminalbit.spongy.command.Broadcast;
+import com.terminalbit.spongy.command.MainCommand;
 import com.terminalbit.spongy.command.Me;
 import com.terminalbit.spongy.command.Nick;
 import com.terminalbit.spongy.command.Party;
+import com.terminalbit.spongy.command.Reload;
 import com.terminalbit.spongy.command.Spawn;
 import com.terminalbit.spongy.command.Warp;
 import com.terminalbit.spongy.command.actAsConsole;
-import com.terminalbit.spongy.command.reloadConfig;
 import com.terminalbit.spongy.command.setSpawn;
 import com.terminalbit.spongy.command.setWarp;
 import com.terminalbit.spongy.command.simpleTP;
@@ -52,6 +59,8 @@ public class Main {
 
 	public static Main access;
 	
+	public String version = Main.class.getAnnotation(Plugin.class).version();
+	
 	@Inject
 	@ConfigDir(sharedRoot = false)
 	private File configDir;
@@ -64,7 +73,8 @@ public class Main {
 
 
 	private boolean useJoinSound;
-	public ConfigurationNode config = null;
+	public ConfigurationNode mConCache = null;
+	public ConfigurationNode uConCache = null;
 
 	public ConfigurationLoader<CommentedConfigurationNode> getLoader(String configName) throws IOException {
 	    File configFile = new File(this.configDir, configName);
@@ -81,6 +91,8 @@ public class Main {
 		try {
 			mainConfig = this.getLoader("config.conf");
 			userConfig = this.getLoader("userdata.conf");
+			mConCache = mainConfig.load();
+			uConCache = userConfig.load();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -88,16 +100,15 @@ public class Main {
 		Plugin plugin = Main.class.getAnnotation(Plugin.class);
 		logger.info("Spongy v" + plugin.version() + " is starting...");
 		try {
-			config = mainConfig.load();
-			config.getNode("version").setValue(plugin.version());
-			if(config.getNode("playJoinSound").isVirtual()){
-				config.getNode("playJoinSound").setValue(false);
+			mConCache.getNode("version").setValue(plugin.version());
+			if(mConCache.getNode("playJoinSound").isVirtual()){
+				mConCache.getNode("playJoinSound").setValue(false);
 			}
-			if(config.getNode("enableParty").isVirtual()){
-				config.getNode("enableParty").setValue(false);
+			if(mConCache.getNode("enableParty").isVirtual()){
+				mConCache.getNode("enableParty").setValue(false);
 			}
-			useJoinSound = config.getNode("playJoinSound").getBoolean();
-			mainConfig.save(config);
+			useJoinSound = mConCache.getNode("playJoinSound").getBoolean();
+			mainConfig.save(mConCache);
 
 		} catch (IOException exception) {
 			exception.printStackTrace();
@@ -165,6 +176,19 @@ public class Main {
 				//.permission("spongy.tele.spawn")
 				.executor(new Spawn())
 				.build();
+		CommandSpec reload = CommandSpec
+				.builder()
+				.arguments()
+				.permission("spongy.admin.reload")
+				.executor(new Reload())
+				.build();
+		HashMap<List<String>, CommandSpec> mainChildren = new HashMap<List<String>, CommandSpec>();
+		mainChildren.put(Arrays.asList("reload"), reload);
+		CommandSpec main = CommandSpec
+				.builder()
+				.children(mainChildren)
+				.executor(new MainCommand())
+				.build();
 		/*
 		 * defaultData.setPermission(SubjectData.GLOBAL_CONTEXT, "spongy.tp.spawn", Tristate.TRUE);
            defaultData.setPermission(SubjectData.GLOBAL_CONTEXT, "spongy.tp.warp", Tristate.TRUE);
@@ -183,6 +207,7 @@ public class Main {
 		cmdService.register(this, nick,"nick");
 		cmdService.register(this, me,"me");
 		cmdService.register(this, party,"party");
+		cmdService.register(this, main, "spongy");
 	}
 
 	@Subscribe
@@ -235,11 +260,7 @@ public class Main {
 		// Replace all colorcodes with actual ones
 		String original = Texts.toLegacy(event.getNewMessage(),'&');
 		ConfigurationNode thisConfig = null;
-		try {
-			thisConfig = userConfig.load();
-		} catch (IOException e) {
-			logger.error("Failed to load userConfig");
-		}
+		thisConfig = uConCache;
 		try{
 			//temporary nickname implementation
 			//sloppy as crap.

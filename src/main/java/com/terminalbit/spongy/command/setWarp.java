@@ -40,16 +40,13 @@ public class setWarp implements CommandExecutor {
     	//Gets the, you know, stuff from the main class.
     	this.logger = Main.access.logger;
     	this.game = Main.access.game;
+    	
     	this.configManager = Main.access.mainConfig;
     }
 	public CommandResult execute(CommandSource cS, CommandContext args)
 			throws CommandException {
+		this.config = Main.access.mConCache;
 		String passed = args.getOne("Warp Name").get().toString();
-		try {
-			config = configManager.load();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		passed = passed.toLowerCase();
 		try{
 		if(Integer.toString(Integer.parseInt(passed)).equals(passed)){

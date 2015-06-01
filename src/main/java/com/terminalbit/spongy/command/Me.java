@@ -43,8 +43,7 @@ public class Me implements CommandExecutor {
 	public CommandResult execute(CommandSource cS, CommandContext args)
 			throws CommandException {
 		String passed = args.getOne("Action").get().toString();
-		try {
-			config = userConfig.load();
+			config = Main.access.uConCache;
 			if(passed.length() == 0){
 				cS.sendMessage(Texts.of("Usage: /me <content>"));
 			}else {
@@ -54,10 +53,6 @@ public class Me implements CommandExecutor {
 				}
 				game.getServer().broadcastMessage(Texts.of(Texts.fromLegacy("&5* " + nickname + "&5 " + passed, '&')));
 			}
-			userConfig.save(config);
-		} catch (IOException e) {
-		}
-		
 		return CommandResult.empty();
 	}
 }

@@ -14,10 +14,14 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.block.tileentity.Sign;
+import org.spongepowered.api.data.manipulator.tileentity.SignData;
 //import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.block.tileentity.SignChangeEvent;
 import org.spongepowered.api.event.entity.player.PlayerChatEvent;
 import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 import org.spongepowered.api.event.state.InitializationEvent;
@@ -26,6 +30,7 @@ import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.command.CommandService;
 import org.spongepowered.api.service.config.ConfigDir;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
@@ -280,25 +285,21 @@ public class Main {
 		event.setNewMessage(Texts.of(Texts.fromLegacy(original, '&')));
 	}
 	
-	/*@SuppressWarnings("deprecation")
+	@SuppressWarnings("deprecation")
 	@Subscribe
 	public void onSignEdit(SignChangeEvent event){
 		logger.info("Sign Edited!");
 		//le epic sause.
-		SignData BlockLoco = event.getSign().getSignData();
-		String line0 = BlockLoco.getLine(0).toString();
-		String line1 = BlockLoco.getLine(1).toString();
-		String line2 = BlockLoco.getLine(2).toString();
-		String line3 = BlockLoco.getLine(3).toString();
-		BlockLoco.setLine(0, Texts.fromLegacy(line0,'&'));
-		BlockLoco.setLine(0, Texts.fromLegacy(line1,'&'));
-		BlockLoco.setLine(0, Texts.fromLegacy(line2,'&'));
-		BlockLoco.setLine(0, Texts.fromLegacy(line3,'&'));
-		event.getSign().offer(BlockLoco);
+		SignData BlockLoco = event.getNewData();
+		String line0 = Texts.toPlain(BlockLoco.getLine(0));
+		String line1 = Texts.toPlain(BlockLoco.getLine(1));
+		String line2 = Texts.toPlain(BlockLoco.getLine(2));
+		String line3 = Texts.toPlain(BlockLoco.getLine(3));
+		BlockLoco.setLine(0, Texts.of(Texts.fromLegacy(line0,'&')));
+		BlockLoco.setLine(1, Texts.of(Texts.fromLegacy(line1,'&')));
+		BlockLoco.setLine(2, Texts.of(Texts.fromLegacy(line2,'&')));
+		BlockLoco.setLine(3, Texts.of(Texts.fromLegacy(line3,'&')));
+		//event.getSign().offer(BlockLoco);
+		event.setNewData(BlockLoco);
 	}
-	@SuppressWarnings("deprecation")
-	@Subscribe
-	public void onBlockPlace(BlockPlaceEvent event){
-		event.setCancelled(true);
-	}*/
 }

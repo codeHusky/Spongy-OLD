@@ -263,7 +263,7 @@ public class Main {
 	@Subscribe(order = Order.LAST)
 	public void onMessage(PlayerChatEvent event) {
 		// Replace all colorcodes with actual ones
-		String original = Texts.toLegacy(event.getNewMessage(),'&');
+		String original = Texts.replaceCodes(event.getNewMessage().toString(), '&');
 		ConfigurationNode thisConfig = null;
 		thisConfig = uConCache;
 		try{
@@ -282,7 +282,7 @@ public class Main {
 		original = "&r"  + original;
 		//logger.info("In /config/Spongy/config.conf, please change \"imcom");
 		//event.setMessage(Texts.of(Texts.fromLegacy(original, '&')));
-		event.setNewMessage(Texts.of(Texts.fromLegacy(original, '&')));
+		event.setNewMessage(Texts.of(Texts.replaceCodes(original, '&')));
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -295,10 +295,10 @@ public class Main {
 		String line1 = Texts.toPlain(BlockLoco.getLine(1));
 		String line2 = Texts.toPlain(BlockLoco.getLine(2));
 		String line3 = Texts.toPlain(BlockLoco.getLine(3));
-		BlockLoco.setLine(0, Texts.of(Texts.fromLegacy(line0,'&')));
-		BlockLoco.setLine(1, Texts.of(Texts.fromLegacy(line1,'&')));
-		BlockLoco.setLine(2, Texts.of(Texts.fromLegacy(line2,'&')));
-		BlockLoco.setLine(3, Texts.of(Texts.fromLegacy(line3,'&')));
+		BlockLoco.setLine(0, Texts.of(Texts.replaceCodes(line0,'&')));
+		BlockLoco.setLine(1, Texts.of(Texts.replaceCodes(line1,'&')));
+		BlockLoco.setLine(2, Texts.of(Texts.replaceCodes(line2,'&')));
+		BlockLoco.setLine(3, Texts.of(Texts.replaceCodes(line3,'&')));
 		//event.getSign().offer(BlockLoco);
 		event.setNewData(BlockLoco);
 	}

@@ -297,16 +297,20 @@ public class Main {
 	public void onSignEdit(SignChangeEvent event){
 		logger.info("Sign Edited!");
 		//le epic sause.
-		SignData BlockLoco = event.getNewData();
-		String line0 = Texts.toPlain(BlockLoco.getLine(0));
-		String line1 = Texts.toPlain(BlockLoco.getLine(1));
-		String line2 = Texts.toPlain(BlockLoco.getLine(2));
-		String line3 = Texts.toPlain(BlockLoco.getLine(3));
-		BlockLoco.setLine(0, Texts.of(Texts.replaceCodes(line0,'&')));
-		BlockLoco.setLine(1, Texts.of(Texts.replaceCodes(line1,'&')));
-		BlockLoco.setLine(2, Texts.of(Texts.replaceCodes(line2,'&')));
-		BlockLoco.setLine(3, Texts.of(Texts.replaceCodes(line3,'&')));
-		//event.getSign().offer(BlockLoco);
-		event.setNewData(BlockLoco);
+		try {
+			SignData BlockLoco = event.getNewData();
+			String line0 = Texts.toPlain(BlockLoco.getLine(0));
+			String line1 = Texts.toPlain(BlockLoco.getLine(1));
+			String line2 = Texts.toPlain(BlockLoco.getLine(2));
+			String line3 = Texts.toPlain(BlockLoco.getLine(3));
+			BlockLoco.setLine(0, Texts.of(Texts.legacy('&').from(line0)));
+			BlockLoco.setLine(1, Texts.of(Texts.legacy('&').from(line1)));
+			BlockLoco.setLine(2, Texts.of(Texts.legacy('&').from(line2)));
+			BlockLoco.setLine(3, Texts.of(Texts.legacy('&').from(line3)));
+			//event.getSign().offer(BlockLoco);
+			event.setNewData(BlockLoco);
+		} catch (TextMessageException exe) {
+			exe.printStackTrace();
+		}
 	}
 }

@@ -32,7 +32,7 @@ public class Broadcast implements CommandExecutor  {
 			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ",TextColors.RED, "You need to type some broadcast content."));
 		}else if(cS.hasPermission("spongy.chat.broadcast")){
 			cS.sendMessage(Texts.of(TextColors.GOLD,"You Broadcasted \"",TextColors.RESET, broadcastContent, TextColors.GOLD,"\""));
-			game.getServer().broadcastMessage(Texts.of("§4" + broadcaster + " §r" + broadcastContent));
+			game.getServer().getBroadcastSink().sendMessage(Texts.of("§4" + broadcaster + " §r" + broadcastContent));
 			return CommandResult.success();
 		}else{
 			cS.sendMessage(Texts.of(TextColors.DARK_RED,"Error: ",TextColors.RED, "You do not have permission to use /broadcast"));

@@ -32,6 +32,8 @@ import org.spongepowered.api.service.command.CommandService;
 import org.spongepowered.api.service.config.ConfigDir;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.TextMessageException;
 import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
@@ -263,7 +265,7 @@ public class Main {
 	@Subscribe(order = Order.LAST)
 	public void onMessage(PlayerChatEvent event) {
 		// Replace all colorcodes with actual ones
-		String original = Texts.toLegacy(event.getNewMessage(),'&');
+		String original = Texts.legacy('&').to(event.getNewMessage());
 		ConfigurationNode thisConfig = null;
 		thisConfig = uConCache;
 		try{
@@ -272,7 +274,7 @@ public class Main {
 			//also need a config entry on how people want this to be formatted.
 			String username = thisConfig.getNode(event.getSource().getIdentifier(),"nickname").getString();
 			String edited = original.replace(event.getSource().getName(), username);
-			original = edited;	
+			original = edited;
 		}catch(NullPointerException e){
 		}
 		try {
@@ -282,7 +284,12 @@ public class Main {
 		original = "&r"  + original;
 		//logger.info("In /config/Spongy/config.conf, please change \"imcom");
 		//event.setMessage(Texts.of(Texts.fromLegacy(original, '&')));
-		event.setNewMessage(Texts.of(Texts.fromLegacy(original, '&')));
+		try {
+			event.setNewMessage(Texts.legacy('&').from(original));
+		} catch (TextMessageException ex) {
+			ex.printStackTrace();
+		}
+
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -290,16 +297,20 @@ public class Main {
 	public void onSignEdit(SignChangeEvent event){
 		logger.info("Sign Edited!");
 		//le epic sause.
-		SignData BlockLoco = event.getNewData();
-		String line0 = Texts.toPlain(BlockLoco.getLine(0));
-		String line1 = Texts.toPlain(BlockLoco.getLine(1));
-		String line2 = Texts.toPlain(BlockLoco.getLine(2));
-		String line3 = Texts.toPlain(BlockLoco.getLine(3));
-		BlockLoco.setLine(0, Texts.of(Texts.fromLegacy(line0,'&')));
-		BlockLoco.setLine(1, Texts.of(Texts.fromLegacy(line1,'&')));
-		BlockLoco.setLine(2, Texts.of(Texts.fromLegacy(line2,'&')));
-		BlockLoco.setLine(3, Texts.of(Texts.fromLegacy(line3,'&')));
-		//event.getSign().offer(BlockLoco);
-		event.setNewData(BlockLoco);
+		try {
+			SignData BlockLoco = event.getNewData();
+			String line0 = Texts.toPlain(BlockLoco.getLine(0));
+			String line1 = Texts.toPlain(BlockLoco.getLine(1));
+			String line2 = Texts.toPlain(BlockLoco.getLine(2));
+			String line3 = Texts.toPlain(BlockLoco.getLine(3));
+			BlockLoco.setLine(0, Texts.of(Texts.legacy('&').from(line0)));
+			BlockLoco.setLine(1, Texts.of(Texts.legacy('&').from(line1)));
+			BlockLoco.setLine(2, Texts.of(Texts.legacy('&').from(line2)));
+			BlockLoco.setLine(3, Texts.of(Texts.legacy('&').from(line3)));
+			//event.getSign().offer(BlockLoco);
+			event.setNewData(BlockLoco);
+		} catch (TextMessageException exe) {
+			exe.printStackTrace();
+		}
 	}
 }

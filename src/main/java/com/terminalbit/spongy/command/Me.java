@@ -51,7 +51,7 @@ public class Me implements CommandExecutor {
 				if(nickname.equals("null")){
 					nickname = cS.getName();
 				}
-				game.getServer().broadcastMessage(Texts.of(Texts.fromLegacy("&5* " + nickname + "&5 " + passed, '&')));
+				game.getServer().getBroadcastSink().sendMessage(Texts.of(Texts.replaceCodes("&5* " + nickname + "&5 " + passed, '&')));
 			}
 		return CommandResult.empty();
 	}
